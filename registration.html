@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Shadows+Into+Light&family=Tilt+Neon&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/header.css">
+  <link rel="stylesheet" href="styles/general.css">
+  <link rel="stylesheet" href="styles/motto.css">
+  <link rel="stylesheet" href="styles/footer.css">
+  <link rel="stylesheet" href="styles/registration.css">
+</head>
+<body>
+  <div class="header">
+    <div class="leftSection">
+        <a href="home.html">CClinic</a>
+    </div>
+    <div class="rightSection">
+        <a href="contact_us.html">Contact Us</a>
+        <a href="">About Us</a>
+        <a href="">Services</a>
+        <a href="appointment.html">Appointment</a>
+        <a href="faq.html">FAQ</a>
+        <a href="login.html">
+            Login
+            <img src="pic/nopfp.png" alt="" class="defaultPfp">
+        </a>
+    </div>
+  </div>
+
+  <div class="registerFrm">
+    <form id="registrationForm">
+      <input type="hidden" name="formType" value="registrationForm">
+      <div class="gridFrm">
+        <p class="title">Create an Account</p>
+
+        <fieldset>
+          <input class="input" type="text" id="username" name="Username" placeholder="Username" required>
+        </fieldset>
+
+        <fieldset>
+          <input class="input" type="email" id="email" name="Email" placeholder="Email" required>
+        </fieldset>
+
+        <fieldset>
+          <input class="input" type="tel" id="phone" name="Phone" pattern="[0-9]{3}-[0-9]{7}" placeholder="Phone | Format: 123-4567891" required>
+        </fieldset>
+
+        <fieldset>
+          <select id="gender" name="Gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <input class="input" type="number" id="age" name="Age" min="18" placeholder="Age" required>
+        </fieldset>
+
+        <fieldset>
+          <input class="input" type="password" id="password" name="Password" placeholder="Password" required>
+        </fieldset>
+
+        <fieldset>
+          <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+        </fieldset>
+
+        <fieldset>
+          <button class="submitBtn" type="submit" id="submit-button">Register</button>
+        </fieldset>
+      </div>
+      <div id="message" style="
+        display: none;
+        margin: 20px;
+        font-weight: bold;
+        color: green;
+        padding: 8px;
+        background-color: beige;
+        border-radius: 4px;
+        border-color: aquamarine;
+        "></div>
+    </form>
+
+    <div id="loginLink">
+      <p>Already have an account? <a href="login.html">Log in here</a>.</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+        <div class="column">
+            <h3 class="clinicName">CClinic</h3>
+            <p class="quote">Get the care that you deserve!</p>
+            <p>CClinic <br> G-12, Ground Floor, <br>Berjaya Durianport, <br>No.99 Jalan Coconut, <br>
+                59169 Ulu Klang, <br>Malaysia</p>
+            <p><span class="openingText">Opening Hours</span> <br> Mon-Fri: 12pm-9pm <br> Sat: 10am-3pm</p>
+        </div>
+        
+        <div class="column" id="col2">
+            <h3>Contact Us</h3>
+            <p>CClinic Customer Service : +03-75218381</p>
+            <p>Mr Eric Contact Number : +018-51516362</p>
+            <p>Mr Lee Contact Number : +016-9840192</p>
+            <p>Mr Phoon Contact Number : +017-9243521</p>
+            <p>Email : healthcare20@gmail.com</p>
+        </div>
+    </div>
+
+    <div class="copyright">
+        <p>Copyright © 2023 CClinic. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("registrationForm").addEventListener("submit", function (event) {
+      event.preventDefault(); 
+      document.getElementById("message").textContent = "Account is being created..";
+      document.getElementById("message").style.backgroundColor = "cyan";
+      document.getElementById("message").style.color = "black";
+      document.getElementById("message").style.display = "block";
+      document.getElementById("submit-button").disabled = true;
+
+      var formData = new FormData(this);
+      var password = formData.get('Password');
+      var confirmPassword = formData.get('confirmPassword');
+
+      // Password validation
+      if (!/^[A-Za-z]/.test(password) || password.length < 6) {
+        document.getElementById("message").textContent = "Password must start with an alphabet and be at least 6 characters long!";
+        document.getElementById("message").style.backgroundColor = "red";
+        document.getElementById("message").style.color = "white";
+        document.getElementById("submit-button").disabled = false;
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        document.getElementById("message").textContent = "Passwords do not match!";
+        document.getElementById("message").style.backgroundColor = "red";
+        document.getElementById("message").style.color = "white";
+        document.getElementById("submit-button").disabled = false;
+        return; 
+      }
+
+      var keyValuePairs = [];
+      for (var pair of formData.entries()) {
+        keyValuePairs.push(pair[0] + "=" + pair[1]);
+      }
+
+      var formDataString = keyValuePairs.join("&");
+
+      fetch(
+        "https://script.google.com/macros/s/AKfycbxGNOiKXrL8zJZp51PknE7yI5ZgHMO-RWKTplheIZRcCNo-1EjAYgZCp5J4sphwkX03/exec",
+        {
+          redirect: "follow",
+          method: "POST",
+          body: formDataString,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+          },
+        }
+      )
+        .then(function (response) {
+          if (response.ok) {
+            return response.text();
+          } else {
+            throw new Error("Failed to submit the form.");
+          }
+        })
+        .then(function (data) {
+          document.getElementById("message").textContent =
+            "Account created successfully!";
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").style.backgroundColor = "purple";
+          document.getElementById("message").style.color = "beige";
+          document.getElementById("submit-button").disabled = false;
+          document.getElementById("registrationForm").reset();
+
+          setTimeout(function () {
+            window.location.href = "login.html"; // Redirect to login page
+          }, 2600);
+        })
+        .catch(function (error) {
+          console.error(error);
+          document.getElementById("message").textContent =
+            "An error occurred while creating an account.";
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").style.backgroundColor = "red";
+          document.getElementById("message").style.color = "white";
+          document.getElementById("submit-button").disabled = false;
+        });
+    });
+  </script>
+
+</body>
+</html>

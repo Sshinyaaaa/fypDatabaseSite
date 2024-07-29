@@ -1,0 +1,79 @@
+body {
+  margin: 0;
+}
+
+.h1 {
+  text-align: center;
+}
+
+.serviceGrid {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+
+.col {
+  flex: 1;
+  margin: 10px;
+  text-align: center;
+}
+
+.card {
+  position: relative;
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.card:active {
+  background-color: rgb(165, 165, 165);
+}
+
+.card h3 {
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-center {
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.acuteImg {
+  width: 100%;
+  max-width: 800px; /* Make the image larger */
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2em;
+  margin: 10px 0;
+}
+
+.description {
+  font-size: 1em;
+  line-height: 1.5;
+  text-align: justify;
+  width: 100%;
+  max-width: 1000px; /* Span the full width */
+  margin: 0 auto;
+}
+

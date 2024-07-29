@@ -1,0 +1,17 @@
+.loginFrm {
+  background-color: rgb(197, 215, 236);
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  padding: 5px 5px;
+  width: 650px; 
+  margin: 50px auto; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+}
+
+
+.loginFrm h2{
+  align-items: center;
+}

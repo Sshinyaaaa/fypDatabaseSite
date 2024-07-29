@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Adashboard.css">
+    <link rel="stylesheet" href="styles/updateAppointment.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="sidebar">
+                <h2 class="clinicName">CClinic</h2>
+                <ul>
+                    <li id="dashboard">
+                        <a href="Adashboard.html">Dashboard</a>
+                    </li>
+                    <li id="team">
+                        <a href="Ateam.html">Team</a>
+                    </li>
+                    <li id="diagnosis">
+                        <a href="Adiagnosis.html">Diagnosis Update</a>
+                    </li>
+                    <li id="patient">
+                        <a href="Apatient.html">Patient</a>
+                    </li>
+                    <li id="contact">
+                        <a href="Acontactmsg.html">Contact Message</a>
+                      </li>
+                      <li id="Generate Bill">
+                        <a href="AgenerateBill.html">Generate Bill</a>
+                      </li>
+                    <li id="logout">
+                        <a href="Alogin.html">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    
+        <div class="right">
+            <div class="header">
+                <div class="leftSection">
+                    <p>Dashboard</p>
+                </div>
+                <div class="rightSection">
+                    <div>
+                        <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+                        <span class="username" id="loginStatusHeader">Login</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom">
+                <h1 class="listTxt">Click on Status Column to Edit</h1>
+
+                <div id="appointments">
+                    <form id="updateAppointmentForm" onsubmit="confirmChanges(event)">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentTableBody">
+                                <tr><td>Loading...</td></tr>
+                            </tbody>
+                        </table>
+                        <button type="submit" class="Confirmbutton">Confirm Changes</button>
+                    </form>
+
+                    <div id="message" style="
+                        display: none;
+                        margin: 20px;
+                        font-weight: bold;
+                        color: green;
+                        padding: 8px;
+                        background-color: beige;
+                        border-radius: 4px;
+                        border-color: aquamarine;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProfileData();
+        loadAppointments(); 
+        setUsername();
+    });
+
+    function setUsername() {
+        const username = sessionStorage.getItem('username');
+        if (username) {
+            document.getElementById('loginStatusHeader').textContent = username;
+        }
+    }
+
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            sessionStorage.removeItem('username');
+            window.location.href = 'login.html';
+        });
+    }
+
+    var currentPage = window.location.pathname;
+    var username = sessionStorage.getItem('username');
+
+    function loadProfileData() {
+        fetch('https://script.google.com/macros/s/AKfycbxvLeo7sNthe9zURrypKfUEHIBm8eZw6YFh2YX7qsOroER_sr6VYsWkY6DqdqQMoFpu/exec?sheetName=admin&currentPage=' + currentPage + '&username=' + username)
+        .then(res => res.json())
+        .then(data => {
+            let filteredData = data.content.filter(row => row[0] === username);
+            if (filteredData.length > 0) {
+                let cur = filteredData[0];
+                let columns = [cur[0], cur[1], cur[2], cur[3], cur[4], cur[5]];
+                let td = columns.map((e, index) => '<td id="col' + index + '">' + e + '</td>');
+                let tr = '<tr>' + td.join("") + '</tr>';
+                document.querySelector(".table tbody").innerHTML = tr;
+            }
+        });
+    }
+
+    function setupSingleClickEdit() {
+        var table = document.querySelector('.table');
+        var rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach((row, rowIndex) => {
+            row.addEventListener('click', function(event) {
+                var target = event.target;
+                if (target.tagName === 'TD') {
+                    var columnIndex = target.cellIndex;
+                    var currentValue = target.textContent.trim();
+
+                    if (columnIndex === 5) {
+                        var selectField = document.createElement('select');
+                        var acceptedOption = document.createElement('option');
+                        var declinedOption = document.createElement('option');
+
+                        acceptedOption.value = 'Accepted';
+                        acceptedOption.text = 'Accepted';
+                        declinedOption.value = 'Declined';
+                        declinedOption.text = 'Declined';
+
+                        selectField.appendChild(acceptedOption);
+                        selectField.appendChild(declinedOption);
+
+                        selectField.value = currentValue;
+                        target.innerHTML = '';
+                        target.appendChild(selectField);
+
+                        selectField.focus();
+                        selectField.addEventListener('blur', function() {
+                            target.innerHTML = selectField.value;
+                            if (selectField.value === 'Accepted') {
+                                incrementAttendedAndCharges(row);
+                            }
+                        });
+
+                        selectField.addEventListener('change', function() {
+                            target.innerHTML = selectField.value;
+                            if (selectField.value === 'Accepted') {
+                                incrementAttendedAndCharges(row);
+                            }
+                        });
+
+                    } else if (columnIndex === 8 || columnIndex === 9) {
+                        var inputField = document.createElement('input');
+                        inputField.type = 'number';
+                        inputField.value = currentValue;
+
+                        target.innerHTML = '';
+                        target.appendChild(inputField);
+
+                        inputField.focus();
+                        inputField.addEventListener('blur', function() {
+                            target.innerHTML = inputField.value;
+                        });
+
+                        inputField.addEventListener('change', function() {
+                            target.innerHTML = inputField.value;
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    function incrementAttendedAndCharges(row) {
+        var appointmentsAttendedCell = row.cells[8];
+        var chargesDueCell = row.cells[9];
+
+        var appointmentsAttended = parseInt(appointmentsAttendedCell.textContent) || 0;
+        var chargesDue = parseInt(chargesDueCell.textContent) || 0;
+
+        appointmentsAttendedCell.textContent = appointmentsAttended + 1;
+        chargesDueCell.textContent = chargesDue + 30;
+    }
+
+    function confirmChanges(event) {
+        event.preventDefault(); 
+
+        const messageElement = document.getElementById("message");
+        messageElement.textContent = "Changing Details...";
+        messageElement.style.backgroundColor = "purple";
+        messageElement.style.color = "black";
+        messageElement.style.display = "block";
+
+        const updatedData = [];
+        const rows = document.querySelectorAll('#appointmentTableBody tr');
+
+        rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('td');
+            const rowData = [];
+            cells.forEach((cell, colIndex) => {
+                rowData.push(cell.textContent.trim());
+            });
+            updatedData.push(rowData);
+        });
+
+        const postData = {
+            type: 'confirmChanges',
+            updatedData: JSON.stringify(updatedData)
+        };
+
+        const queryString = Object.keys(postData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]))
+            .join('&');
+
+        fetch('https://script.google.com/macros/s/AKfycbxvLeo7sNthe9zURrypKfUEHIBm8eZw6YFh2YX7qsOroER_sr6VYsWkY6DqdqQMoFpu/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: queryString
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageElement.textContent = "Details Successfully Changed!";
+                messageElement.style.backgroundColor = "purple";
+                messageElement.style.color = "beige";
+                setTimeout(() => {
+                    location.reload();  // Refresh the page after a few seconds
+                }, 2000);  // Adjust the delay time as needed (2000 milliseconds = 2 seconds)
+            } else {
+                messageElement.textContent = "Failed to change details. Please contact admin.";
+                messageElement.style.backgroundColor = "red";
+                messageElement.style.color = "white";
+            }
+        })
+        .catch(error => {
+            messageElement.textContent = "Failed to change details. Please contact admin.";
+            messageElement.style.backgroundColor = "red";
+            messageElement.style.color = "white";
+        });
+    }
+
+    function loadAppointments() {
+        // Cache buster
+        const cacheBuster = new Date().getTime();
+
+        fetch('https://script.google.com/macros/s/AKfycbxvLeo7sNthe9zURrypKfUEHIBm8eZw6YFh2YX7qsOroER_sr6VYsWkY6DqdqQMoFpu/exec?cacheBuster=' + cacheBuster)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  // Debug the fetch response
+            let tableBody = document.getElementById('appointmentTableBody');
+            tableBody.innerHTML = '';  // Clear the loading message
+
+            // Process the rows
+            data.content.forEach((row) => {
+                let tr = document.createElement('tr');
+                row.forEach((cell, index) => {
+                    let td = document.createElement('td');
+                    td.textContent = formatDate(cell);
+                    if (index === 5) {
+                        td.classList.add('editable-dropdown');
+                    } else if (index === 8 || index === 9) {
+                        td.classList.add('editable-number');
+                    }
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+            setupSingleClickEdit(); 
+        });
+    }
+
+    function formatDate(cell) {
+        const datePattern = /^\d{4}-\d{2}-\d{2}T/;
+        if (datePattern.test(cell)) {
+            return new Date(cell).toLocaleDateString();
+        }
+        return cell;
+    }
+    </script>
+</body>
+</html>

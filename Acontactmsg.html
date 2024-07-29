@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>admin</title>
+
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Adashboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="diagnosis">
+            <a href="Adiagnosis.html">Diagnosis Update</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="contact">
+            <a href="Acontactmsg.html">Contact Message</a>
+          </li>
+          <li id="Generate Bill">
+            <a href="AgenerateBill.html">Generate Bill</a>
+          </li>
+        </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Dashboard</p>
+        </div>
+        <div class="rightSection">
+          <div>
+            <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+            <span class="username" id="loginStatusHeader">Login</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <h1 class="welcomeTxt"><span class="grayTxt">Hello,</span> Dr.<span class="username" id="loginStatusWelcome">Login</span></h1>
+      <p class="appointTxt"><span class="grayTxt">These are the messages sent from users.</span></p>
+
+      <div id="appointments">
+        <table class="table">
+          <tr><td>Loading...</td></tr>
+        </table>
+      </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      date.setDate(date.getDate() + 1); 
+      const year = date.getUTCFullYear();
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = date.getUTCDate().toString().padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    }
+
+    var currentPage = window.location.pathname;
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0];
+    filename = filename.replace(/^A/, '');
+
+    console.log("Current filename:", filename); 
+
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active."); 
+    } else {
+      console.log("No corresponding sidebar item found for:", filename); 
+    }
+
+    var username = sessionStorage.getItem('username');
+
+    var loginStatusElementHeader = document.getElementById('loginStatusHeader');
+    var loginStatusElementWelcome = document.getElementById('loginStatusWelcome');
+
+    if (username) {
+      loginStatusElementHeader.textContent = username;
+      loginStatusElementWelcome.textContent = username;
+
+      loginStatusElementHeader.parentElement.href = "profile.html";
+      loginStatusElementWelcome.parentElement.href = "profile.html";
+    }
+
+    fetch('https://script.google.com/macros/s/AKfycbye3_QJromQ4BNebnRhDTkkZt7VkhilsaDWBm57bNoRvURl29tjWXZBF1L_vOOMJ0F6dg/exec?sheetName=contactMsg&currentPage=' + currentPage)
+    .then(res => res.json())
+    .then(data => {
+        let tr = data.content.reduce((prev, cur) => {
+            let td = cur.map((e, index) => {
+                if (index === 6 && e === "NaN-NaN-NaN") {
+                    return `<td>${e}</td>`; // Leave as is if NaN-NaN-NaN
+                } else if (index === 6) {
+                    const date = new Date(e);
+                    if (isNaN(date.getTime())) {
+                        return `<td>${e}</td>`; // Leave unchanged if not a valid date
+                    } else {
+                        const formattedDate = date.toLocaleDateString(); // Convert to date format
+                        return `<td>${formattedDate}</td>`;
+                    }
+                } else {
+                    return `<td>${e}</td>`;
+                }
+            });
+            return prev + `<tr>${td.join("")}</tr>`;
+        }, "");
+        document.querySelector("table").innerHTML = tr;
+    });
+  </script>
+</body>
+</html>

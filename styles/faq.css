@@ -1,0 +1,22 @@
+h1{
+  text-align: center;
+}
+
+.faq{
+  border: solid;
+  border-width: 1px;
+  border-color: black;
+  border-radius: 6px;
+  width: 1220px;
+  margin: 10px auto 20px auto;
+  padding: 0px 10px 2px 25px;
+  background-color: rgb(203, 209, 216);
+}
+
+.question{
+  font-weight: bold;
+}
+
+.answer{
+  font-size: 17px;
+}

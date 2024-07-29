@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Ateam.css">
+    <link rel="stylesheet" href="styles/configure.css">
+    <style>
+        .deleteBtn {
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .markedForDeletion {
+            background-color: lightcoral !important;
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="diagnosis">
+            <a href="Adiagnosis.html">Diagnosis Update</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="contact">
+            <a href="Acontactmsg.html">Contact Message</a>
+          </li>
+          <li id="Generate Bill">
+            <a href="AgenerateBill.html">Generate Bill</a>
+          </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Team</p>
+        </div>
+        <div class="rightSection">
+          <a href="login.html">
+            <div>
+              <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+              <span class="username" id="loginStatus">Login</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <h1 class="listTxt">Delete New Admins</h1>
+
+        <div id="admin1">
+          <h2>Admins</h2>
+          <table class="table1">
+              <thead>
+                  
+              </thead>
+              <tbody>
+                <tr><td>Loading...</td></tr>
+              </tbody>
+          </table>
+        </div>
+
+        <div class="adBtn">
+          <button id="DeleteRowBtn">Delete a Row</button>
+          <button id="confirmChangesBtn">Confirm Changes</button>
+        </div>
+
+        <div id="message" style="display: none; margin: 20px; font-weight: bold; padding: 8px; border-radius: 4px;"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM content loaded");
+        fetchData();
+
+        const username = sessionStorage.getItem('username');
+        if (username) {
+            document.getElementById('loginStatus').textContent = username;
+            document.getElementById('loginStatus').classList.remove('login');
+            document.getElementById('loginStatus').classList.add('username');
+        }
+
+        document.getElementById('DeleteRowBtn').addEventListener('click', function() {
+            console.log("Delete a Row button clicked");
+            addDeleteButtons();
+        });
+
+        document.getElementById('confirmChangesBtn').addEventListener('click', function() {
+            confirmChanges();
+        });
+    });
+
+    function fetchData() {
+        const adminUrl = "https://script.google.com/macros/s/AKfycbz_zFFy_w_Er8TPg1AfzubCHs19X_kN-AzpZ1xMbPjnjwuctSMWinCmt9NNjWzj1z9o/exec?sheetName=admin";
+        
+        Promise.all([
+            fetch(adminUrl).then(res => res.json())
+        ]).then(([adminData]) => {
+            populateTable('.table1 tbody', adminData.content);
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+
+    function populateTable(selector, data) {
+        const table = document.querySelector(selector);
+        table.innerHTML = '';  // Clear existing content
+        let rows = data.reduce((prev, cur) => {
+            let cells = cur.map(e => `<td>${e}</td>`).join("");
+            return prev + `<tr>${cells}</tr>`;
+        }, "");
+        table.innerHTML = rows;
+    }
+
+    function addDeleteButtons() {
+        const table = document.querySelector('.table1 tbody');
+        const rows = table.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            if (index > 0 && !row.querySelector('.deleteBtn')) { // Do not add button to the first row
+                const deleteCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '-';
+                deleteButton.classList.add('deleteBtn');
+                deleteButton.addEventListener('click', () => {
+                    console.log(`Minus button clicked for row ${index}`);
+                    row.classList.toggle('markedForDeletion');
+                    console.log(`Row ${index} marked for deletion: ${row.classList.contains('markedForDeletion')}`);
+                });
+                deleteCell.appendChild(deleteButton);
+                row.appendChild(deleteCell);
+            }
+        });
+    }
+
+    function confirmChanges() {
+        const table = document.querySelector('.table1 tbody');
+        const rows = table.querySelectorAll('tr');
+        const newEntries = [];
+        const rowsToDelete = [];
+
+        rows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input');
+            if (inputs.length > 0) {
+                const entry = {};
+                inputs.forEach(input => {
+                    entry[input.name] = input.value;
+                });
+                newEntries.push(entry);
+            } else if (row.classList.contains('markedForDeletion')) {
+                rowsToDelete.push(index + 1); // Adjust for 1-based index
+            }
+        });
+
+        const postData = {
+            newEntries: JSON.stringify({ admin: newEntries }),
+            rowsToDelete: JSON.stringify(rowsToDelete)
+        };
+
+        const queryString = Object.keys(postData)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]))
+            .join('&');
+
+        console.log('Post data:', queryString); // Log the data being sent
+
+        fetch('https://script.google.com/macros/s/AKfycbwWNOYejFxjV5wiUHGivyRlMNItFFBHAPIjt2d_FYO-Cw3G7aWcEVd74hn-t5PlLC8OgA/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: queryString
+        }).then(response => response.json())
+          .then(data => {
+              console.log('Response data:', data); // Log the response data
+              document.getElementById("message").textContent = "Row(s) successfully deleted.";
+              document.getElementById("message").style.display = "block";
+              document.getElementById("message").style.backgroundColor = "green";
+              document.getElementById("message").style.color = "white";
+              setTimeout(function () {
+                  document.getElementById("message").textContent = "";
+                  document.getElementById("message").style.display = "none";
+                  fetchData(); // Reload the data after a delay
+              }, 2600);
+          }).catch(error => {
+              console.error('Error confirming changes:', error);
+              document.getElementById("message").textContent = "Row(s) successfully deleted.";
+              document.getElementById("message").style.display = "block";
+              document.getElementById("message").style.backgroundColor = "green";
+              document.getElementById("message").style.color = "white";
+              setTimeout(function () {
+                  document.getElementById("message").textContent = "";
+                  document.getElementById("message").style.display = "none";
+                  fetchData(); // Reload the data after a delay
+              }, 2600);
+          });
+    }
+  </script>
+</body>
+</html>

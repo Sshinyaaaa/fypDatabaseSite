@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Panel</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Shadows+Into+Light&family=Tilt+Neon&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/header.css">
+  <link rel="stylesheet" href="styles/general.css">
+  <link rel="stylesheet" href="styles/motto.css">
+  <link rel="stylesheet" href="styles/login.css">
+  <link rel="stylesheet" href="styles/footer.css">
+  <link rel="stylesheet" href="styles/profileDropdown.css">
+  <link rel="stylesheet" href="styles/profile.css">
+  <link rel="stylesheet" href="styles/myAccount.css">
+  <link rel="stylesheet" href="styles/patientHistory.css">
+
+</head>
+<body>
+  <div class="header">
+    <div class="leftSection">
+        <a href="home.html">CClinic</a>
+    </div>
+    <div class="rightSection">
+        <a href="contact_us.html">Contact Us</a>
+        <a href="about_us.html">About Us</a>
+        <a href="service.html">Services</a>
+        <a href="appointment.html">Appointment</a>
+        <a href="faq.html">FAQ</a>
+        <div class="user-profile">
+          <a href="login.html">
+              <img src="pic/nopfp.png" alt="" class="defaultPfp">
+              <span class="username">Login</span>
+          </a>
+          <div class="dropdown-content">
+            <a href="profile.html">Account</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+      </div>
+    </div>
+  </div> 
+  
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h1>My Account</h1>
+        <ul>
+          <li id="profile"><a href="profile.html">Profile</a></li>
+          <li id="patientHistory"><a href="patientHistory.html">Patient History</a></li>
+          <li id="paymentDue"><a href="paymentDue.html">Payment Due</a></li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div>
+        <h2 class="title">History</h2>
+
+        <div id="payment">
+          <table class="table">
+            <tr><td>Loading...</td></tr>
+          </table>
+        </div>
+        
+        <p class="noticeTxt">Notice any errors? Let us <a href="contact_us.html">know</a></p>
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="footer">
+    <div class="footer-content">
+        <div class="column">
+            <h3 class="clinicName">CClinic</h3>
+            <p class="quote">Get the care that you deserve!</p>
+            <p>CClinic <br> G-12, Ground Floor, <br>Berjaya Durianport, <br>No.99 Jalan Coconut, <br>
+                59169 Ulu Klang, <br>Malaysia</p>
+            <p><span class="openingText">Opening Hours</span> <br> Mon-Fri: 12pm-9pm <br> Sat: 10am-3pm</p>
+        </div>
+        
+        <div class="column" id="col2">
+            <h3>Contact Us</h3>
+            <p>CClinic Customer Service : +03-75218381</p>
+            <p>Mr Eric Contact Number : +018-51516362</p>
+            <p>Mr Lee Contact Number : +016-9840192</p>
+            <p>Mr Phoon Contact Number : +017-9243521</p>
+            <p>Email : healthcare20@gmail.com</p>
+        </div>
+    </div>
+
+    <div class="copyright">
+        <p>Copyright © 2023 CClinic. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  updateHeader();
+  highlightCurrentPage();
+});
+
+function updateHeader() {
+  var loginLink = document.querySelector('.rightSection a[href="login.html"]');
+  var username = sessionStorage.getItem('username');
+
+  if (username) {
+    loginLink.querySelector('.username').textContent = username;
+    loginLink.setAttribute('href', 'profile.html');
+    loginLink.querySelector('img').src = 'pic/defPfp.png';
+  }
+}
+
+function highlightCurrentPage() {
+  var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0];
+  var sidebarItem = document.getElementById(filename);
+  if (sidebarItem) {
+    sidebarItem.classList.add('active');
+  }
+}
+
+var logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+    sessionStorage.removeItem('username');
+    window.location.href = 'login.html';
+  });
+}
+
+var currentPage = window.location.pathname;
+var username = sessionStorage.getItem('username');
+
+fetch('https://script.google.com/macros/s/AKfycbye3_QJromQ4BNebnRhDTkkZt7VkhilsaDWBm57bNoRvURl29tjWXZBF1L_vOOMJ0F6dg/exec?sheetName=admin&currentPage=' + currentPage + '&username=' + username)
+.then(res => res.json())
+.then(data => {
+  let tr = data.content.reduce((prev, cur, index) => {
+      if (index === 0 || cur[0] === username) {
+          const columns = [cur[0], cur[6], cur[7], cur[8], cur[9]];
+          let td = columns.map(e => `<td>${e}</td>`);
+          return prev + `<tr>${td.join("")}</tr>`;
+      } else {
+          return prev;
+      }
+  }, "");
+  document.querySelector("table").innerHTML = tr;
+});
+
+</script>
+</body>
+</html>

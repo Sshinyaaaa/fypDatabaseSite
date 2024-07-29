@@ -1,0 +1,88 @@
+body {
+  margin: 0;
+  font-family: Amatic;
+}
+
+.grayTxt {
+  color: rgb(147, 147, 147);
+}
+
+.welcomeTxt,
+.appointTxt {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; 
+}
+
+th {
+  background-color: lightgrey;
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+td {
+  border: 1px solid black;
+  padding: 8px; 
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
+tr:first-child td {
+  font-weight: bold;
+}
+
+
+.appointTxt {
+  font-size: 22px;
+  text-decoration: underline;
+  text-decoration-color: rgb(147, 147, 147);
+}
+
+
+.appointBtn {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; 
+}
+
+.appointBtn a{
+  text-decoration: none;
+}
+
+.appointBtn a:hover{
+  background-color: rgb(30, 97, 170);
+}
+
+.appointBtn a:active{
+  opacity: 0.7;
+}
+
+.add {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border: none;
+  background-color: rgb(45, 129, 219);
+  color: rgb(238, 255, 243);
+  margin-right: 20px;
+  padding: 10px 20px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.add:hover{
+  background-color: #2980b9;
+}
+
+.add:active {
+  opacity: 0.6;
+}

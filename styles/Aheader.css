@@ -1,0 +1,38 @@
+.header{
+  background-color: rgb(225, 247, 113);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.leftSection{
+  font-size: 20px;
+}
+
+.leftSection p {
+  font-size: 27px;
+  font-weight: bold;
+}
+
+
+.rightSection{
+  display: flex; 
+  font-size: 20px;
+  gap: 40px; 
+}
+
+.leftSection a,
+.rightSection a{
+  text-decoration: none;
+  color: navy;
+}
+
+.defaultPfp{
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+  margin-left: 4px;
+}

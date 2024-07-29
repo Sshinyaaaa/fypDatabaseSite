@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>admin</title>
+
+    <script>
+      var currentPage = window.location.pathname; // Get the path of the URL
+      var pageName = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0]; // Extract the filename
+      pageName = pageName.replace(/^A/, ''); // Remove the 'A' prefix
+
+      console.log("Page name:", pageName);
+
+      console.log("Current page name:", pageName);
+
+      var spreadsheetUrl;
+
+      if (pageName === 'dashboard') {
+          spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1uk0pmZbifMBp_HOSZOWeA_N6K_BbM4om0FklwFXQGvU/edit#gid=1958937708";
+      } else if (pageName === 'team') {
+          spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1uk0pmZbifMBp_HOSZOWeA_N6K_BbM4om0FklwFXQGvU/edit#gid=2019276517";
+      }
+
+      console.log("Spreadsheet URL:", spreadsheetUrl);
+    </script>
+  
+
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Adashboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Dashboard</p>
+        </div>
+        <div class="rightSection">
+          <div>
+            <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+            <span class="username" id="loginStatusHeader">Login</span>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="welcomeTxt"><span class="grayTxt">Welcome,</span> Dr.<span class="username" id="loginStatusWelcome">Login</span></h1>
+      <p class="appointTxt"><span class="grayTxt">These are the appointments for this week</span></p>
+
+      <div id="appointments">
+        <table class="table"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentPage = window.location.pathname; // Get the path of the URL
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0]; // Extract the filename
+    filename = filename.replace(/^A/, ''); // Remove the 'A' prefix
+
+    console.log("Current filename:", filename); 
+
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active."); 
+    } else {
+      console.log("No corresponding sidebar item found for:", filename); 
+    }
+
+    var username = sessionStorage.getItem('username');
+
+    var loginStatusElementHeader = document.getElementById('loginStatusHeader');
+    var loginStatusElementWelcome = document.getElementById('loginStatusWelcome');
+
+    if (username) {
+      loginStatusElementHeader.textContent = username;
+      loginStatusElementWelcome.textContent = username;
+
+      loginStatusElementHeader.parentElement.href = "profile.html";
+      loginStatusElementWelcome.parentElement.href = "profile.html";
+    }
+
+    document.getElementById("addAdminForm").addEventListener("submit", function (event) {
+      event.preventDefault(); 
+      document.getElementById("message").textContent = "Admin Account is being created..";
+      document.getElementById("message").style.backgroundColor = "cyan";
+      document.getElementById("message").style.color = "black";
+      document.getElementById("message").style.display = "block";
+      document.getElementById("submit-button").disabled = true;
+  
+      var formData = new FormData(this);
+      var password = formData.get('password');
+      var confirmPassword = formData.get('confirmPassword');
+  
+      if (password !== confirmPassword) {
+        document.getElementById("message").textContent = "Passwords do not match!";
+        document.getElementById("message").style.backgroundColor = "red";
+        document.getElementById("message").style.color = "white";
+        document.getElementById("submit-button").disabled = false;
+        return; 
+      }
+  
+      var keyValuePairs = [];
+      for (var pair of formData.entries()) {
+        keyValuePairs.push(pair[0] + "=" + pair[1]);
+      }
+  
+      var formDataString = keyValuePairs.join("&");
+  
+      fetch(
+        "https://script.google.com/macros/s/AKfycbye3_QJromQ4BNebnRhDTkkZt7VkhilsaDWBm57bNoRvURl29tjWXZBF1L_vOOMJ0F6dg/exec",
+        {
+          redirect: "follow",
+          method: "POST",
+          body: formDataString,
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+        }
+      )
+        .then(function (response) {
+          if (response) {
+            return response;
+          } else {
+            throw new Error("Failed to submit the form.");
+          }
+        })
+        .then(function (data) {
+          document.getElementById("message").textContent =
+            "Admin Account created successfully!";
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").style.backgroundColor = "purple";
+          document.getElementById("message").style.color = "beige";
+          document.getElementById("submit-button").disabled = false;
+          document.getElementById("addAdminForm").reset();
+  
+          setTimeout(function () {
+            document.getElementById("message").textContent = "";
+            document.getElementById("message").style.display = "none";
+          }, 2600);
+        })
+        .catch(function (error) {
+          console.error(error);
+          document.getElementById("message").textContent =
+            "An error occurred while creating an account.";
+          document.getElementById("message").style.display = "block";
+        });
+      });
+  </script>
+</body>
+</html>

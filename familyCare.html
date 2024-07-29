@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/header.css">
+    <link rel="stylesheet" href="styles/general.css">
+    <link rel="stylesheet" href="styles/footer.css">
+    <link rel="stylesheet" href="styles/acuteCare.css">
+</head>
+<body>
+    <div class="header">
+        <div class="leftSection">
+            <a href="home.html">CClinic</a>
+        </div>
+        <div class="rightSection">
+            <a href="contact_us.html">Contact Us</a>
+            <a href="about_us.html">About Us</a>
+            <a href="service.html">Services</a>
+            <a href="appointment.html">Appointment</a>
+            <a href="faq.html">FAQ</a>
+            <div class="user-profile">
+                <a href="login.html">
+                    <img src="pic/nopfp.png" alt="" class="defaultPfp">
+                    <span class="username">Login</span>
+                </a>
+                <div class="dropdown-content">
+                    <a href="profile.html">Account</a>
+                    <a href="paymentDue.html">Payment</a>
+                    <a href="#" id="logoutBtn">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-center">
+            <img src="pic/familyCare.jpg" alt="" class="acuteImg">
+            <h1 class="title">Family Care</h1>
+            <p class="description">Family care is a comprehensive approach to healthcare that focuses on the well-being of individuals within the context of their family and community. It emphasizes preventive care, early intervention, and the management of acute and chronic health conditions for all family members, regardless of age or gender. The goal of family care is to provide continuous and coordinated care that supports the overall health and well-being of the family unit.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="column">
+                <h3 class="clinicName">CClinic</h3>
+                <p class="quote">Get the care that you deserve!</p>
+                <p>CClinic <br> G-12, Ground Floor, <br>Berjaya Durianport, <br>No.99 Jalan Coconut, <br> 59169 Ulu Klang, <br>Malaysia</p>
+                <p><span class="openingText">Opening Hours</span> <br> Mon-Fri: 12pm-9pm <br> Sat: 10am-3pm</p>
+            </div>
+
+            <div class="column" id="col2">
+                <h3>Contact Us</h3>
+                <p>CClinic Customer Service: +03-75218381</p>
+                <p>Mr Eric Contact Number: +018-51516362</p>
+                <p>Mr Lee Contact Number: +016-9840192</p>
+                <p>Mr Phoon Contact Number: +017-9243521</p>
+                <p>Email: healthcare20@gmail.com</p>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>Copyright © 2023 CClinic. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function updateHeader() {
+            var loginLink = document.querySelector('.rightSection a[href="login.html"]');
+            var username = sessionStorage.getItem('username');
+            var dropdownContent = document.querySelector('.dropdown-content');
+
+            if (username) {
+                loginLink.querySelector('.username').textContent = username;
+                loginLink.setAttribute('href', 'profile.html');
+                loginLink.querySelector('img').src = 'pic/defPfp.png';
+
+                if (!document.querySelector('link[href="styles/profileDropdown.css"]')) {
+                    var profileDropdownCSS = document.createElement('link');
+                    profileDropdownCSS.rel = 'stylesheet';
+                    profileDropdownCSS.href = 'styles/profileDropdown.css';
+                    document.head.appendChild(profileDropdownCSS);
+                }
+            } else {
+                dropdownContent.style.display = 'none';
+
+                var existingCSS = document.querySelector('link[href="styles/profileDropdown.css"]');
+                if (existingCSS) {
+                    existingCSS.parentNode.removeChild(existingCSS);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHeader();
+        });
+
+        var logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                sessionStorage.removeItem('username');
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</body>
+</html>

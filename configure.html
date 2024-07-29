@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>admin</title>
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Ateam.css">
+    <link rel="stylesheet" href="styles/configure.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="diagnosis">
+            <a href="Adiagnosis.html">Diagnosis Update</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="Generate Bill">
+            <a href="AgenerateBill.html">Generate Bill</a>
+          </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Team</p>
+        </div>
+        <div class="rightSection">
+          <a href="login.html">
+            <div>
+              <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+              <span class="username" id="loginStatus">Login</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <h1 class="listTxt">List of Administration Team</h1>
+
+        <div>
+          <div id="admin2">
+            <h2>Overseer</h2>
+            <table class="table2">
+              <tr><td>Loading...</td></tr>
+            </table>
+          </div>
+
+          <div class="adBtn">
+            <a href="Addoverseer.html" class="add">Add</a>
+            <a href="Deleteoverseer.html" class="delete">Delete</a>
+          </div>
+        </div>
+
+        <div id="admin1">
+          <h2>Admins</h2>
+          <table class="table1">
+              <tr><td>Loading...</td></tr>
+          </table>
+        </div>
+
+        <div class="adBtn">
+          <a href="Addadmin.html" class="add">Add</a>
+          <a href="Deleteadmin.html" class="delete">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM content loaded");
+        fetchData();
+    });
+
+    function fetchData() {
+        const adminUrl = "https://script.google.com/macros/s/AKfycbz_zFFy_w_Er8TPg1AfzubCHs19X_kN-AzpZ1xMbPjnjwuctSMWinCmt9NNjWzj1z9o/exec?sheetName=admin";
+        const overseerUrl = "https://script.google.com/macros/s/AKfycbz_zFFy_w_Er8TPg1AfzubCHs19X_kN-AzpZ1xMbPjnjwuctSMWinCmt9NNjWzj1z9o/exec?sheetName=overseer";
+        
+        Promise.all([
+            fetch(adminUrl).then(res => res.json()),
+            fetch(overseerUrl).then(res => res.json())
+        ]).then(([adminData, overseerData]) => {
+            populateTable('.table1', adminData.content);
+            populateTable('.table2', overseerData.content);
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+
+    function populateTable(selector, data) {
+        const table = document.querySelector(selector);
+        table.innerHTML = '';  // Clear existing content
+        let rows = data.reduce((prev, cur) => {
+            let cells = cur.map(e => `<td>${e}</td>`).join("");
+            return prev + `<tr>${cells}</tr>`;
+        }, "");
+        table.innerHTML = rows;
+    }
+
+    var currentPage = window.location.href;
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1);
+    filename = filename.split('.')[0];
+    filename = filename.replace(/^A/, '');
+    console.log("Current filename:", filename);
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active.");
+    } else {
+      console.log("No corresponding sidebar item found for:", filename); 
+    }
+
+    var username = sessionStorage.getItem('username');
+    var loginStatusElement = document.getElementById('loginStatus');
+    if (username) {
+      loginStatusElement.textContent = username;
+      loginStatusElement.parentElement.href = "profile.html";
+
+      // Check if the username exists in the Google Sheet
+      fetch('https://script.google.com/macros/s/AKfycbwgiQVCFsJ5TXoCX1I1Zm2LFvgsYrEd6GGCkOsjfC-PTSclDQm5iQDUXz7g9QhEYXWJgA/exec?username=' + username)
+      .then(res => res.json())
+      .then(data => {
+          if (data.exists) {
+            document.getElementById('addAdmin').style.display = 'block';
+          }
+      });
+    }
+
+    
+  </script>
+</body>
+</html>

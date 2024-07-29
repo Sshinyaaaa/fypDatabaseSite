@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>admin</title>
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Ateam.css">
+    <link rel="stylesheet" href="styles/configure.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="diagnosis">
+            <a href="Adiagnosis.html">Diagnosis Update</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="contact">
+            <a href="Acontactmsg.html">Contact Message</a>
+          </li>
+          <li id="Generate Bill">
+            <a href="AgenerateBill.html">Generate Bill</a>
+          </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Team</p>
+        </div>
+        <div class="rightSection">
+          <a href="login.html">
+            <div>
+              <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+              <span class="username" id="loginStatus">Login</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <h1 class="listTxt">Add Overseer</h1>
+
+        <div>
+          <div id="admin2">
+            <h2>Overseer</h2>
+            <table class="table2">
+              <thead>
+                <tr>
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="adBtn">
+            <button id="createRowBtn">Create New Row</button>
+            <button id="confirmChangesBtn">Confirm Changes</button>
+          </div>
+
+          <div id="message" style="display: none; margin: 20px; font-weight: bold; padding: 8px; border-radius: 4px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM content loaded");
+        fetchData();
+
+        document.getElementById('createRowBtn').addEventListener('click', function() {
+            createNewRow();
+        });
+
+        document.getElementById('confirmChangesBtn').addEventListener('click', function() {
+            confirmChanges();
+        });
+    });
+
+    function fetchData() {
+        const overseerUrl = "https://script.google.com/macros/s/AKfycbz_zFFy_w_Er8TPg1AfzubCHs19X_kN-AzpZ1xMbPjnjwuctSMWinCmt9NNjWzj1z9o/exec?sheetName=overseer";
+        
+        Promise.all([
+            fetch(overseerUrl).then(res => res.json())
+        ]).then(([overseerData]) => {
+            populateTable('.table2 tbody', overseerData.content);
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+
+    function populateTable(selector, data) {
+        const table = document.querySelector(selector);
+        table.innerHTML = '';  // Clear existing content
+        let rows = data.reduce((prev, cur) => {
+            let cells = cur.map(e => `<td>${e}</td>`).join("");
+            return prev + `<tr>${cells}</tr>`;
+        }, "");
+        table.innerHTML = rows;
+    }
+
+    function createNewRow() {
+        const table = document.querySelector('.table2 tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `<td><input type="text" name="Overseer"></td>
+                         <td><input type="text" name="Real Name"></td>`;
+        table.appendChild(row);
+    }
+
+    function confirmChanges() {
+        const table = document.querySelector('.table2 tbody');
+        const rows = table.querySelectorAll('tr');
+        const newEntries = [];
+
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            if (inputs.length > 0) {
+                const entry = {};
+                inputs.forEach(input => {
+                    entry[input.name] = input.value;
+                });
+                newEntries.push(entry);
+            }
+        });
+
+        if (newEntries.length > 0) {
+            const postData = {
+                newEntries: JSON.stringify({ overseer: newEntries })
+            };
+
+            const queryString = Object.keys(postData)
+                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]))
+                .join('&');
+
+            fetch('https://script.google.com/macros/s/AKfycbwgiQVCFsJ5TXoCX1I1Zm2LFvgsYrEd6GGCkOsjfC-PTSclDQm5iQDUXz7g9QhEYXWJgA/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: queryString
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("message").textContent = "Changes confirmed successfully!";
+                document.getElementById("message").style.display = "block";
+                document.getElementById("message").style.backgroundColor = "green";
+                document.getElementById("message").style.color = "white";
+                setTimeout(function () {
+                      document.getElementById("message").textContent = "";
+                      document.getElementById("message").style.display = "none";
+                      fetchData(); // Reload the data after a delay
+                  }, 2600);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
+
+    var currentPage = window.location.href;
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1);
+    filename = filename.split('.')[0];
+    filename = filename.replace(/^A/, '');
+    console.log("Current filename:", filename);
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active.");
+    } else {
+      console.log("No corresponding sidebar item found for:", filename); 
+    }
+
+    var username = sessionStorage.getItem('username');
+    var loginStatusElement = document.getElementById('loginStatus');
+    if (username) {
+      loginStatusElement.textContent = username;
+      loginStatusElement.parentElement.href = "profile.html";
+
+      // Check if the username exists in the Google Sheet
+      fetch('https://script.google.com/macros/s/AKfycbwgiQVCFsJ5TXoCX1I1Zm2LFvgsYrEd6GGCkOsjfC-PTSclDQm5iQDUXz7g9QhEYXWJgA/exec?username=' + username)
+      .then(res => res.json())
+      .then(data => {
+          if (data.exists) {
+            document.getElementById('addAdmin').style.display = 'block';
+          }
+      });
+    }
+  </script>
+</body>
+</html>

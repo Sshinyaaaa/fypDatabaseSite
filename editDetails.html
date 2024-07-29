@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Panel</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Shadows+Into+Light&family=Tilt+Neon&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/header.css">
+  <link rel="stylesheet" href="styles/general.css">
+  <link rel="stylesheet" href="styles/motto.css">
+  <link rel="stylesheet" href="styles/login.css">
+  <link rel="stylesheet" href="styles/footer.css">
+  <link rel="stylesheet" href="styles/profileDropdown.css">
+  <link rel="stylesheet" href="styles/editDetails.css">
+  <link rel="stylesheet" href="styles/myAccount.css">
+  <link rel="stylesheet" href="styles/paymentDue.css">
+</head>
+<body>
+  <div class="header">
+    <div class="leftSection">
+        <a href="home.html">CClinic</a>
+    </div>
+    <div class="rightSection">
+        <a href="contact_us.html">Contact Us</a>
+        <a href="about_us.html">About Us</a>
+        <a href="service.html">Services</a>
+        <a href="appointment.html">Appointment</a>
+        <a href="faq.html">FAQ</a>
+        <div class="user-profile">
+          <a href="login.html">
+              <img src="pic/nopfp.png" alt="" class="defaultPfp">
+              <span class="username">Login</span>
+          </a>
+          <div class="dropdown-content">
+            <a href="profile.html">Account</a>
+            <a href="paymentDue.html">Payment</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+      </div>
+    </div>
+  </div> 
+  
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h1>My Account</h1>
+        <ul>
+          <li id="profile"><a href="profile.html">Profile</a></li>
+          <li id="patientHistory"><a href="patientHistory.html">Patient History</a></li>
+          <li id="paymentDue"><a href="paymentDue.html">Payment Due</a></li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div>
+        <h2 class="title">Double Click to Edit Detail</h2>
+
+        <div id="profile">
+          <form id="editDetailsForm" onsubmit="confirmChanges(event)">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Password</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data will be inserted here -->
+              </tbody>
+            </table>
+
+            <div class="makePayment-container">
+              <button type="submit" class="makePayment">Confirm Changes</button>
+            </div>
+          </form>
+
+          <div id="message" style="
+            display: none;
+            margin: 20px;
+            font-weight: bold;
+            color: green;
+            padding: 8px;
+            background-color: beige;
+            border-radius: 4px;
+            border-color: aquamarine;
+            "></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+        <div class="column">
+            <h3 class="clinicName">CClinic</h3>
+            <p class="quote">Get the care that you deserve!</p>
+            <p>CClinic <br> G-12, Ground Floor, <br>Berjaya Durianport, <br>No.99 Jalan Coconut, <br>
+                59169 Ulu Klang, <br>Malaysia</p>
+            <p><span class="openingText">Opening Hours</span> <br> Mon-Fri: 12pm-9pm <br> Sat: 10am-3pm</p>
+        </div>
+        
+        <div class="column" id="col2">
+            <h3>Contact Us</h3>
+            <p>CClinic Customer Service : +03-75218381</p>
+            <p>Mr Eric Contact Number : +018-51516362</p>
+            <p>Mr Lee Contact Number : +016-9840192</p>
+            <p>Mr Phoon Contact Number : +017-9243521</p>
+            <p>Email : healthcare20@gmail.com</p>
+        </div>
+    </div>
+
+    <div class="copyright">
+        <p>Copyright © 2023 CClinic. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    updateHeader();
+    highlightCurrentPage();
+    setupDoubleClickEdit();
+    loadProfileData();
+  });
+
+  function updateHeader() {
+    var loginLink = document.querySelector('.rightSection a[href="login.html"]');
+    var username = sessionStorage.getItem('username');
+
+    if (username) {
+      loginLink.querySelector('.username').textContent = username;
+      loginLink.setAttribute('href', 'profile.html');
+      loginLink.querySelector('img').src = 'pic/defPfp.png';
+    }
+  }
+
+  function highlightCurrentPage() {
+    console.log("Current page:", currentPage);
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0]; 
+    console.log("Current filename:", filename);
+
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active.");
+    } else {
+      console.log("No corresponding sidebar item found for:", filename);
+    }
+  }
+
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      sessionStorage.removeItem('username');
+      window.location.href = 'login.html';
+    });
+  }
+
+  var currentPage = window.location.pathname;
+  var username = sessionStorage.getItem('username');
+
+  function loadProfileData() {
+    fetch('https://script.google.com/macros/s/AKfycbxGNOiKXrL8zJZp51PknE7yI5ZgHMO-RWKTplheIZRcCNo-1EjAYgZCp5J4sphwkX03/exec?sheetName=admin&currentPage=' + currentPage + '&username=' + username)
+    .then(res => res.json())
+    .then(data => {
+      let filteredData = data.content.filter(row => row[0] === username);
+      if (filteredData.length > 0) {
+        let cur = filteredData[0];
+        let columns = [cur[0], cur[1], cur[2], cur[3], cur[4], cur[5]];
+        let td = columns.map((e, index) => {
+          if (index === 0) { 
+            return `<td id="col${index}">${e}</td>`; 
+          } else {
+            return `<td class="editable" id="col${index}">${e}</td>`;
+          }
+        });
+        let tr = `<tr>${td.join("")}</tr>`;
+        document.querySelector(".table tbody").innerHTML = tr;
+
+        setupDoubleClickEdit(); 
+      }
+    });
+  }
+
+  function setupDoubleClickEdit(){
+    var editableFields = document.querySelectorAll('.editable');
+
+    editableFields.forEach(function(field){
+      field.addEventListener('dblclick', function(){
+        var currentValue = field.textContent.trim();
+        var inputField = document.createElement('input');
+        inputField.setAttribute('type', 'text');
+        inputField.setAttribute('value', currentValue);
+        inputField.classList.add('edit-input');
+
+        field.innerHTML = '';
+        field.appendChild(inputField);
+
+        inputField.focus();
+        inputField.addEventListener('blur', function(){
+          var newValue = inputField.value.trim();
+          field.innerHTML = newValue;
+        });
+
+        inputField.addEventListener('keydown', function(event){
+          if (event.key === 'Enter') {
+            var newValue = inputField.value.trim();
+            field.innerHTML = newValue;
+          }
+        });
+      });
+    });
+  }
+
+  function confirmChanges(event) {
+    event.preventDefault(); 
+
+    const messageElement = document.getElementById("message");
+    messageElement.textContent = "Changing Details...";
+    messageElement.style.backgroundColor = "purple";
+    messageElement.style.color = "black";
+    messageElement.style.display = "block";
+
+    const tableRow = document.querySelector('.table tbody tr');
+    const cells = tableRow.querySelectorAll('td');
+    
+    const updatedData = Array.from(cells).reduce((data, cell, index) => {
+      data[`col${index}`] = cell.textContent.trim();
+      return data;
+    }, {});
+
+    const requestData = {
+      username: updatedData.col0.trim(),
+      updatedData: JSON.stringify([updatedData]), // Wrap in an array
+      action: 'confirmChanges'
+    };
+
+    const queryString = Object.keys(requestData)
+      .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(requestData[key]))
+      .join('&');
+
+    fetch('https://script.google.com/macros/s/AKfycbxGNOiKXrL8zJZp51PknE7yI5ZgHMO-RWKTplheIZRcCNo-1EjAYgZCp5J4sphwkX03/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: queryString
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        messageElement.textContent = "Details Successfully Changed!";
+        messageElement.style.backgroundColor = "purple";
+        messageElement.style.color = "beige";
+      } else {
+        messageElement.textContent = `Failed to change details: ${data.message}. Please contact admin.`;
+        messageElement.style.backgroundColor = "red";
+        messageElement.style.color = "white";
+      }
+    })
+    .catch(error => {
+      messageElement.textContent = `Failed to change details due to an error: ${error.message}. Please contact admin.`;
+      messageElement.style.backgroundColor = "red";
+      messageElement.style.color = "white";
+    });
+  }
+</script>
+</body>
+</html>

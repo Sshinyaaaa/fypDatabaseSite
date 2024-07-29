@@ -1,0 +1,129 @@
+.miniLeft {
+  float: left;
+  width: 40%;
+  text-align: center;
+}
+
+.miniRight {
+  width: 60%;
+  float: right;
+  background-color: rgb(248, 247, 247);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.centered{
+  text-align: center;
+}
+
+.amountTitle{
+  color: rgb(121, 120, 120);
+  font-size: 40px;
+  margin-top: 140px;
+}
+
+table{
+  margin: 0 auto;
+  font-size: 50px;
+  line-height: 0.3;
+  text-decoration: underline;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+#paymentOptions {
+  margin-bottom: 20px; 
+}
+
+.optionBtn {
+  margin: 0 10px; 
+  padding: 10px 20px; 
+  background-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  transition: background-color 0.3s; 
+}
+
+.optionBtn:hover {
+  background-color: #0056b3; 
+}
+
+button:active {
+  opacity: 0.7;
+}
+
+.right {
+  height: 850px;
+}
+
+#onlinebankingForm,
+#cardForm {
+  display: none;
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+.det {
+  font-size: 17px;
+  color: rgb(79, 79, 79);
+}
+
+.submit-btn{ 
+  display: block;
+  margin: 20px auto; 
+  text-align: center;
+  background-color: #11345a;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-top: 20px; 
+  width: 670px;
+  height: 30px;
+  cursor: pointer; 
+  transition: background-color 0.3s; 
+}
+
+.submit-btn:hover{
+  background-color: #0a1e35;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="text"],
+select {
+  width: 95%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+#message {
+  display: none;
+  margin: 20px;
+  font-weight: bold;
+  color: green;
+  padding: 8px;
+  background-color: beige;
+  border-radius: 4px;
+  border: 1px solid aquamarine;
+}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>admin</title>
+    <link rel="stylesheet" href="styles/Admin.css">
+    <link rel="stylesheet" href="styles/Aheader.css">
+    <link rel="stylesheet" href="styles/Adashboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="sidebar">
+        <h2 class="clinicName">CClinic</h2>
+        <ul>
+          <li id="dashboard">
+            <a href="Adashboard.html">Dashboard</a>
+          </li>
+          <li id="team">
+            <a href="Ateam.html">Team</a>
+          </li>
+          <li id="diagnosis">
+            <a href="Adiagnosis.html">Diagnosis Update</a>
+          </li>
+          <li id="patient">
+            <a href="Apatient.html">Patient</a>
+          </li>
+          <li id="contact">
+            <a href="Acontactmsg.html">Contact Message</a>
+          </li>
+          <li id="Generate Bill">
+            <a href="AgenerateBill.html">Generate Bill</a>
+          </li>
+          <li id="logout">
+            <a href="Alogin.html">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="right">
+      <div class="header">
+        <div class="leftSection">
+          <p>Diagnosis Management</p>
+        </div>
+        <div class="rightSection">
+          <div>
+            <img src="pic/adminPfp.png" id="profileImage" alt="" class="defaultPfp">
+            <span class="username" id="loginStatusHeader">Login</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="title-container">
+          <h2 class="title">Click on Column to Edit</h2>
+        </div>
+  
+        <div id="appointments">
+          <table class="table">
+            <thead>
+              <tr>
+                
+            </thead>
+            <tbody>
+              <tr><td>Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="appointBtn">
+          <button class="add">Confirm Changes</button>
+        </div>
+
+        <div id="message" style="
+            display: none;
+            margin: 20px;
+            font-weight: bold;
+            color: green;
+            padding: 8px;
+            background-color: beige;
+            border-radius: 4px;
+            border-color: aquamarine;
+            "></div>
+  
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      date.setDate(date.getDate() + 1); 
+      const year = date.getUTCFullYear();
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = date.getUTCDate().toString().padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    }
+
+    var currentPage = window.location.pathname;
+    var filename = currentPage.substring(currentPage.lastIndexOf('/') + 1).split('.')[0];
+    filename = filename.replace(/^A/, '');
+
+    console.log("Current filename:", filename); 
+
+    var sidebarItem = document.getElementById(filename);
+    if (sidebarItem) {
+      sidebarItem.classList.add('active');
+      console.log("Sidebar item found and set to active."); 
+    } else {
+      console.log("No corresponding sidebar item found for:", filename); 
+    }
+
+    var username = sessionStorage.getItem('username');
+
+    var loginStatusElementHeader = document.getElementById('loginStatusHeader');
+    var loginStatusElementWelcome = document.getElementById('loginStatusWelcome');
+
+    if (username) {
+      loginStatusElementHeader.textContent = username;
+      loginStatusElementHeader.parentElement.href = "profile.html";
+    }
+
+    fetch('https://script.google.com/macros/s/AKfycbxGNOiKXrL8zJZp51PknE7yI5ZgHMO-RWKTplheIZRcCNo-1EjAYgZCp5J4sphwkX03/exec?sheetName=admin&currentPage=' + currentPage)
+    .then(res => res.json())
+    .then(data => {
+        let tr = data.content.reduce((prev, cur, rowIndex) => {
+            let td = cur.map((e, colIndex) => {
+                if (colIndex === 1 || colIndex === 2 || colIndex === 6) {
+                    return `<td style="display:none;">${e}</td>`;
+                } else if (rowIndex > 0 && colIndex >= 7) { // Make last 3 columns editable for all rows except the first row
+                    return `<td contenteditable="true">${e}</td>`;
+                } else {
+                    return `<td>${e}</td>`;
+                }
+            });
+            return prev + `<tr>${td.join("")}</tr>`;
+        }, "");
+        document.querySelector("table tbody").innerHTML = tr;
+    })
+    .catch(err => {
+        console.error('Error fetching data:', err);
+        document.querySelector("table tbody").innerHTML = "<tr><td colspan='10'>Failed to load data</td></tr>";
+    });
+
+    document.querySelector('.add').addEventListener('click', () => {
+      const messageElement = document.getElementById("message");
+      messageElement.textContent = "Changing Details...";
+      messageElement.style.backgroundColor = "purple";
+      messageElement.style.color = "black";
+      messageElement.style.display = "block";
+      const table = document.querySelector('.table');
+      const rows = table.querySelectorAll('tbody tr');
+      const updatedData = Array.from(rows).map(row => {
+        const cells = row.querySelectorAll('td');
+        const rowData = Array.from(cells).reduce((data, cell, index) => {
+          if (index >= 7 && row.rowIndex > 1) { // Collect data from editable columns, excluding the header row
+            data[`col${index}`] = cell.textContent;
+          }
+          return data;
+        }, {});
+        rowData.username = cells[0].textContent; // Capture the username
+        return rowData;
+      });
+
+      fetch('https://script.google.com/macros/s/AKfycbxGNOiKXrL8zJZp51PknE7yI5ZgHMO-RWKTplheIZRcCNo-1EjAYgZCp5J4sphwkX03/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=confirmChanges&updatedData=${JSON.stringify(updatedData)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          messageElement.textContent = "Details Successfully Changed!";
+          messageElement.style.backgroundColor = "purple";
+          messageElement.style.color = "beige";
+        } else {
+          messageElement.textContent = `Failed to change details: ${data.message}. Please contact admin.`;
+          messageElement.style.backgroundColor = "red";
+          messageElement.style.color = "white";
+        }
+      })
+      .catch(error => {
+        messageElement.textContent = `Failed to change details: ${error.message}. Please contact admin.`;
+        messageElement.style.backgroundColor = "red";
+        messageElement.style.color = "white";
+      });
+    });
+  </script>
+</body>
+</html>

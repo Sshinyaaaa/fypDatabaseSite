@@ -1,0 +1,61 @@
+body {
+  margin: 0;
+}
+
+.h1{
+  text-align: center;
+}
+
+.serviceGrid {
+  margin-top: 60px; 
+  display: grid;
+  grid-template-columns: auto auto auto;
+  
+}
+
+.col {
+  flex: 1;
+  margin: 10px;
+  text-align: center;
+}
+
+.card {
+  position: relative; 
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.description{
+  display: none;
+  position: absolute;
+  top: calc(55% + 2px);
+  left: 0;
+  width: 95%;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.card:hover .description{
+  display: block;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.card:active {
+  background-color: rgb(165, 165, 165);
+}
+
+.card h3 {
+  margin: 0;
+}
+

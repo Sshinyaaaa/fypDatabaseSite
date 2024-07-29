@@ -1,0 +1,53 @@
+.motto {
+  display: grid;
+  grid-template-columns: 1fr 2fr; 
+  width: auto;
+  height: 400px;
+  margin: 0; 
+  padding: 0; 
+}
+
+.left{
+  margin: 0; 
+  font-family: Tilt Neon;
+  font-size: 40px;
+  padding-left: 20px;
+  padding-top: 90px;
+  line-height: 8px;
+}
+
+.t1{
+  font-size: 50px;
+  text-decoration:underline;
+}
+
+.t2{
+  line-height: 40px;
+}
+
+.right{
+  width: 100%; 
+  height: 100%; 
+}
+
+.bookBtn{
+  background-color: rgb(77, 77, 247);
+  color: white;
+  padding: 23px 25px;
+  font-size: 20px;
+  border: none;
+  border-radius: 3px;
+  margin-top: 20px;
+  margin-left: 50px;
+  cursor: pointer;
+  
+  transition: padding 0.2s;
+}
+
+.bookBtn:hover{
+  padding: 27px 29px;
+}
+
+.bookBtn:active{
+  opacity: 0.6;
+}
